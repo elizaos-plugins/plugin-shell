@@ -1,230 +1,230 @@
-# ElizaOS Plugin
+# ElizaOS Shell Plugin
 
-This is an ElizaOS plugin built with the official plugin starter template.
+A powerful shell execution plugin for ElizaOS that provides agents with a virtual shell environment. This plugin enables agents to execute shell commands, navigate directories, and maintain command history across conversations.
 
-## Getting Started
+## Features
 
-```bash
-# Create a new plugin (automatically adds "plugin-" prefix)
-elizaos create -t plugin solana
-# This creates: plugin-solana
-# Dependencies are automatically installed and built
+- **Persistent Shell State**: Maintains working directory and environment across command executions
+- **Natural Language Support**: Agents can describe commands in natural language (e.g., "list all files in the current directory")
+- **Command History**: Tracks all executed commands and their outputs for context
+- **File Operation Tracking**: Monitors file creations, modifications, and deletions
+- **Security Features**: Audit trails and safe command execution
+- **Smart Wildcard Handling**: Automatically quotes wildcards for find and grep commands
 
-# Navigate to the plugin directory
-cd plugin-solana
-
-# Start development immediately
-elizaos dev
-```
-
-## Development
+## Installation
 
 ```bash
-# Start development with hot-reloading (recommended)
-elizaos dev
-
-# OR start without hot-reloading
-elizaos start
-# Note: When using 'start', you need to rebuild after changes:
-# bun run build
-
-# Test the plugin
-elizaos test
+npm install @elizaos/plugin-shell
 ```
 
-## Testing
+## Usage
 
-ElizaOS provides a comprehensive testing structure for plugins:
-
-### Test Structure
-
-- **Component Tests** (`__tests__/` directory):
-
-  - **Unit Tests**: Test individual functions/classes in isolation
-  - **Integration Tests**: Test how components work together
-  - Run with: `elizaos test component`
-
-- **End-to-End Tests** (`e2e/` directory):
-
-  - Test the plugin within a full ElizaOS runtime
-  - Run with: `elizaos test e2e`
-
-- **Running All Tests**:
-  - `elizaos test` runs both component and e2e tests
-
-### Writing Tests
-
-Component tests use Vitest:
+Add the plugin to your ElizaOS agent configuration:
 
 ```typescript
-// Unit test example (__tests__/plugin.test.ts)
-describe('Plugin Configuration', () => {
-  it('should have correct plugin metadata', () => {
-    expect(starterPlugin.name).toBe('plugin-starter');
-  });
-});
+import { shellPlugin } from '@elizaos/plugin-shell';
 
-// Integration test example (__tests__/integration.test.ts)
-describe('Integration: HelloWorld Action with StarterService', () => {
-  it('should handle HelloWorld action with StarterService', async () => {
-    // Test interactions between components
-  });
+const agent = new Agent({
+  plugins: [shellPlugin],
+  // ... other configuration
 });
 ```
 
-E2E tests use ElizaOS test interface:
+## Actions
 
+### runShellCommand
+
+Executes shell commands with persistent state management.
+
+**Examples:**
 ```typescript
-// E2E test example (e2e/starter-plugin.test.ts)
-export class StarterPluginTestSuite implements TestSuite {
-  name = 'plugin_starter_test_suite';
-  tests = [
-    {
-      name: 'example_test',
-      fn: async (runtime) => {
-        // Test plugin in a real runtime
-      },
-    },
-  ];
-}
+// Direct command
+"Run the command: ls -la"
 
-export default new StarterPluginTestSuite();
+// Natural language
+"Show me all TypeScript files in the src directory"
+"Create a new directory called 'test-output'"
+"Check what's in the package.json file"
 ```
 
-The test utilities in `__tests__/test-utils.ts` provide mock objects and setup functions to simplify writing tests.
+**Features:**
+- Maintains working directory between commands
+- Supports pipes, redirects, and command chaining
+- Handles wildcards intelligently
+- Tracks file operations
 
-## Publishing & Continuous Development
+### clearShellHistory
 
-### Initial Setup
+Clears the command history for the current conversation.
 
-Before publishing your plugin, ensure you meet these requirements:
-
-1. **npm Authentication**
-
-   ```bash
-   npm login
-   ```
-
-2. **GitHub Repository**
-
-   - Create a public GitHub repository for this plugin
-   - Add the 'elizaos-plugins' topic to the repository
-   - Use 'main' as the default branch
-
-3. **Required Assets**
-   - Add images to the `images/` directory:
-     - `logo.jpg` (400x400px square, <500KB)
-     - `banner.jpg` (1280x640px, <1MB)
-
-### Initial Publishing
-
-```bash
-# Test your plugin meets all requirements
-elizaos publish --test
-
-# Publish to npm + GitHub + registry (recommended)
-elizaos publish
+**Example:**
+```typescript
+"Clear the shell history"
 ```
 
-This command will:
+### killAutonomous
 
-- Publish your plugin to npm for easy installation
-- Create/update your GitHub repository
-- Submit your plugin to the ElizaOS registry for discoverability
+Stops any long-running or background processes.
 
-### Continuous Development & Updates
-
-**Important**: After your initial publish with `elizaos publish`, all future updates should be done using standard npm and git workflows, not the ElizaOS CLI.
-
-#### Standard Update Workflow
-
-1. **Make Changes**
-
-   ```bash
-   # Edit your plugin code
-   elizaos dev  # Test locally with hot-reload
-   ```
-
-2. **Test Your Changes**
-
-   ```bash
-   # Run all tests
-   elizaos test
-
-   # Run specific test types if needed
-   elizaos test component  # Component tests only
-   elizaos test e2e       # E2E tests only
-   ```
-
-3. **Update Version**
-
-   ```bash
-   # Patch version (bug fixes): 1.0.0 → 1.0.1
-   npm version patch
-
-   # Minor version (new features): 1.0.1 → 1.1.0
-   npm version minor
-
-   # Major version (breaking changes): 1.1.0 → 2.0.0
-   npm version major
-   ```
-
-4. **Publish to npm**
-
-   ```bash
-   npm publish
-   ```
-
-5. **Push to GitHub**
-   ```bash
-   git push origin main
-   git push --tags  # Push version tags
-   ```
-
-#### Why Use Standard Workflows?
-
-- **npm publish**: Directly updates your package on npm registry
-- **git push**: Updates your GitHub repository with latest code
-- **Automatic registry updates**: The ElizaOS registry automatically syncs with npm, so no manual registry updates needed
-- **Standard tooling**: Uses familiar npm/git commands that work with all development tools
-
-### Alternative Publishing Options (Initial Only)
-
-```bash
-# Publish to npm only (skip GitHub and registry)
-elizaos publish --npm
-
-# Publish but skip registry submission
-elizaos publish --skip-registry
-
-# Generate registry files locally without publishing
-elizaos publish --dry-run
+**Example:**
+```typescript
+"Stop the autonomous process"
 ```
 
 ## Configuration
 
-The `agentConfig` section in `package.json` defines the parameters your plugin requires:
+The plugin works out of the box with no required configuration. Optional settings can be provided:
 
-```json
-"agentConfig": {
-  "pluginType": "elizaos:plugin:1.0.0",
-  "pluginParameters": {
-    "API_KEY": {
-      "type": "string",
-      "description": "API key for the service"
-    }
-  }
+```typescript
+const shellPlugin = {
+  name: "shell",
+  description: "Shell command execution with state management",
+  services: [new ShellService()],
+  actions: [runShellCommandAction, clearShellHistoryAction, killAutonomousAction],
+  providers: [shellProvider],
+};
+```
+
+## Shell Service
+
+The `ShellService` class provides the core functionality:
+
+- **Persistent Working Directory**: Each conversation maintains its own working directory
+- **Command Execution**: Safe execution with proper error handling
+- **History Management**: Tracks commands, outputs, and file operations
+- **State Persistence**: Maintains shell state across agent interactions
+
+## Security Considerations
+
+- Commands are executed with the permissions of the ElizaOS process
+- All commands are logged in the audit trail
+- Special characters are properly escaped
+- Consider running ElizaOS in a sandboxed environment for production use
+
+## Development
+
+### Building
+
+```bash
+npm run build
+```
+
+### Testing
+
+The plugin includes comprehensive test coverage:
+
+```bash
+# Run all tests
+npm test
+
+# Run unit tests only
+npm run test:unit
+
+# Run E2E tests only
+npm run test:e2e
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+### Test Structure
+
+- **Unit Tests** (`src/tests/shell.test.ts`): Test individual components in isolation
+- **E2E Tests** (`src/tests/e2e/`): Test real shell interactions
+  - `shell-basic.ts`: Basic command execution
+  - `shell-stateful.ts`: State persistence and directory navigation
+  - `shell-advanced.ts`: Complex commands and workflows
+  - `shell-security.ts`: Security and edge cases
+
+## Examples
+
+### Basic File Operations
+```typescript
+// List files
+"Show me what files are in this directory"
+
+// Create a file
+"Create a file called README.md with the content 'Hello World'"
+
+// Read a file
+"What's in the config.json file?"
+
+// Delete a file
+"Remove the temporary.txt file"
+```
+
+### Directory Navigation
+```typescript
+// Change directory
+"Go to the src directory"
+
+// Check current location
+"Where am I?"
+
+// Create and navigate
+"Create a new folder called 'output' and go into it"
+```
+
+### Complex Operations
+```typescript
+// Find files
+"Find all JavaScript files in the project"
+
+// Search content
+"Search for 'TODO' in all TypeScript files"
+
+// Pipe commands
+"Count how many TypeScript files are in the src directory"
+```
+
+## API Reference
+
+### ShellService
+
+```typescript
+class ShellService {
+  async executeCommand(command: string, workingDir?: string): Promise<ShellCommandResult>
+  async getCommandHistory(conversationId?: string): Promise<CommandHistoryEntry[]>
+  async clearCommandHistory(conversationId?: string): Promise<void>
+  getCurrentWorkingDirectory(conversationId?: string): string
 }
 ```
 
-Customize this section to match your plugin's requirements.
+### Types
 
-## Documentation
+```typescript
+interface ShellCommandResult {
+  output: string;
+  error: string | null;
+  exitCode: number;
+  executedCommand: string;
+  workingDirectory: string;
+}
 
-Provide clear documentation about:
+interface CommandHistoryEntry {
+  command: string;
+  output: string;
+  error: string | null;
+  exitCode: number;
+  timestamp: Date;
+  workingDirectory: string;
+  fileOperations?: FileOperation[];
+}
+```
 
-- What your plugin does
-- How to use it
-- Required API keys or credentials
-- Example usage
-- Version history and changelog
+## Contributing
+
+Contributions are welcome! Please ensure:
+
+1. All tests pass (`npm test`)
+2. Code follows the existing style
+3. New features include tests
+4. Documentation is updated
+
+## License
+
+MIT
+
+## Support
+
+For issues and feature requests, please use the GitHub issue tracker.
